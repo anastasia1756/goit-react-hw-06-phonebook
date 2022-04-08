@@ -1,11 +1,11 @@
-import PropTypes from 'prop-types';
-import { FaBackspace } from 'react-icons/fa';
-import { Input, Wrapper, Button } from './Filter.styled';
+import PropTypes from "prop-types";
+import { FaBackspace } from "react-icons/fa";
+import { Input, Wrapper, Button } from "./Filter.styled";
 
 export const Filter = ({ filter, contacts, onChange, onClick }) => {
   return (
     <Wrapper>
-      {contacts.length > 0 && (
+      {contacts && contacts.length > 0 && (
         <label>
           Find contacts by name
           <Input type="text" name="filter" value={filter} onChange={onChange} />

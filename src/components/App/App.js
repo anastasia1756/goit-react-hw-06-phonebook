@@ -1,4 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { addContact, deleteContact, getContacts } from "redux/contactsSlice";
+import {
+  filterContact,
+  deleteSearchingContact,
+  getFilter,
+} from "redux/filterSlice";
 import { nanoid } from "nanoid";
 import toast, { Toaster } from "react-hot-toast";
 import { ContactList } from "../ContactList";
@@ -6,31 +13,25 @@ import { Filter } from "../Filter";
 import { ContactForm } from "../ContactForm";
 import { Container, Title, Contacts } from "./App.styled";
 
-const LS_KEY = "contacts";
-
 export const App = () => {
-  const [contacts, setContacts] = useState(() => {
-    return JSON.parse(window.localStorage.getItem(LS_KEY)) ?? [];
-  });
-  const [filter, setFilter] = useState("");
-
-  useEffect(() => {
-    window.localStorage.setItem(LS_KEY, JSON.stringify(contacts));
-  }, [contacts]);
+  const contacts = useSelector(getContacts);
+  const filter = useSelector(getFilter);
+  const dispatch = useDispatch();
 
   const filterInputChange = (evt) => {
-    setFilter(evt.currentTarget.value);
+    dispatch(filterContact(evt.currentTarget.value));
   };
   const filterHandleDelete = () => {
-    setFilter("");
+    dispatch(deleteSearchingContact(""));
   };
   const findContact = () => {
     const normilizedFilter = filter.toLowerCase();
+
     return contacts.filter((contact) =>
       contact.name.toLowerCase().includes(normilizedFilter)
     );
   };
-  const addContact = (submitedName, submitedNumber) => {
+  const addingContact = (submitedName, submitedNumber) => {
     const notify = () =>
       toast.error(`${searchedName.name} is already in contacts`);
     const successAdded = () =>
@@ -51,19 +52,20 @@ export const App = () => {
     const searchedName = contacts.find(
       ({ name }) => name.toLowerCase() === submitedName.toLowerCase()
     );
-    searchedName ? notify() : setContacts((state) => [...state, newContact]);
+
+    searchedName ? notify() : dispatch(addContact(newContact));
 
     !searchedName && successAdded();
   };
-  const deleteContact = (contactId) => {
-    setContacts((state) => state.filter((contact) => contact.id !== contactId));
+  const deletingContact = (contactId) => {
+    dispatch(deleteContact(contactId));
   };
 
   const filteredContacts = findContact();
   return (
     <Container>
       <Title>Phonebook</Title>
-      <ContactForm onSubmit={addContact} />
+      <ContactForm onSubmit={addingContact} />
       <Toaster />
       <Contacts>Contacts</Contacts>
       <Filter
@@ -75,7 +77,7 @@ export const App = () => {
       {contacts.length > 0 ? (
         <ContactList
           contacts={filteredContacts}
-          onDeleteClick={deleteContact}
+          onDeleteClick={deletingContact}
         />
       ) : (
         <p>No contacts yet</p>

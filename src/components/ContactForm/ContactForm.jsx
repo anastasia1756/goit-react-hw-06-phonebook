@@ -20,7 +20,6 @@ export const ContactForm = ({ onSubmit }) => {
   };
   const handleSubmit = (evt) => {
     evt.preventDefault();
-    console.log("hi");
     onSubmit(name, number);
     setName("");
     setNumber("");
